@@ -1,0 +1,31 @@
+server:
+  port: 8081
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: user-service-group
+      auto-offset-reset: earliest
+      enable-auto-commit: true    # Автоподтверждение обработки
+      max-poll-records: 500       # Максимум сообщений за раз
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.apache.kafka.common.serialization.ByteArrayDeserializer
+        spring.json.trusted.packages: "com.example.kafkaservice.model"
+        spring.json.value.default.type: "com.example.kafkaservice.model.KafkaMessage"
+        spring.json.use.type.headers: false
+    listener:
+      missing-topics-fatal: false
+
+kafka:
+  topics:
+    write: user.write.service.topic
+    read: user.read.service.topic
+    input: ${kafka.topics.write}
+
+user:
+  write:
+    service:
+      topic: user.write.service.topic
